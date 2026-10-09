@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aroma & Café - Sistema POS</title>
+
+    <!-- Fuentes e Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Hojas de Estilos -->
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/carrito.css">
+</head>
+<body>
+
+    <!-- Checkbox Oculto para despliegue del Carrito -->
+    <input type="checkbox" id="cart-toggle" class="cart-toggle-input">
+
+    <!-- Encabezado / Navegación -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-mug-hot"></i>
+                <span>Aroma & Café</span>
+            </a>
+
+            <!-- Indicador de Identidad de Mesa de esta Tablet -->
+            <div class="mesa-badge-wrapper">
+                <span class="mesa-active-tag">
+                    <i class="fa-solid fa-chair"></i> <span id="lblMesaActual">Mesa --</span>
+                </span>
+                <button class="btn-change-mesa" title="Configurar número de mesa" onclick="solicitarCambioMesa()">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+
+            <div class="cart-btn-wrapper">
+                <label for="cart-toggle" class="cart-btn" onclick="sincronizarIframeCarrito()">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Tu Comanda</span>
+                    <span class="badge" id="cartBadge">0</span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sección Hero -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <span class="hero-subtitle">Cafetería Artesanal</span>
+            <h1>Un momento cálido en cada taza</h1>
+            <p>Disfruta de nuestros granos seleccionados, tostados a la perfección y acompañados con la mejor repostería de la casa.</p>
+        </div>
+    </section>
+
+    <!-- Contenido Principal -->
+    <main class="container main-content">
+        
+        <!-- Filtros por Categoría -->
+        <div class="menu-controls">
+            <div class="categories" id="categoryFilters">
+                <button class="cat-btn active" onclick="filtrarUI('Todos', this)"><i class="fa-solid fa-border-all"></i> Todos</button>
+                <button class="cat-btn" onclick="filtrarUI('Calientes', this)"><i class="fa-solid fa-mug-saucer"></i> Calientes</button>
+                <button class="cat-btn" onclick="filtrarUI('Fríos', this)"><i class="fa-solid fa-glass-water"></i> Fríos</button>
+                <button class="cat-btn" onclick="filtrarUI('Repostería', this)"><i class="fa-solid fa-cookie-bite"></i> Repostería</button>
+            </div>
+        </div>
+
+        <!-- Rejilla Dinámica de Productos -->
+        <section class="products-grid" id="productsContainer">
+            <!-- Inyección desde SQLite -->
+        </section>
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <p><strong>Aroma & Café POS</strong> — Sistema de Gestión Interna</p>
+            <p>© 2026 Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Overlay y Drawer del Carrito -->
+    <label for="cart-toggle" class="cart-overlay"></label>
+    <div class="cart-drawer-container">
+        <iframe src="html/carrito.html" class="cart-iframe" id="cartIframe"></iframe>
+    </div>
+
+    <!-- Modal para Configurar Mesa Fija de la Tablet -->
+    <div id="modalMesa" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <i class="fa-solid fa-tablet-screen-button modal-icon"></i>
+            <h2>Configuración de Dispositivo</h2>
+            <p>Selecciona qué número de mesa asignarle a esta tablet:</p>
+
+            <select id="selectConfigMesa" class="modal-select">
+                <option value="1">Mesa 1</option>
+                <option value="2">Mesa 2</option>
+                <option value="3">Mesa 3</option>
+                <option value="4">Mesa 4</option>
+                <option value="5">Mesa 5</option>
+                <option value="6">Mesa 6</option>
+            </select>
+
+            <button class="modal-btn" onclick="guardarMesaDispositivo()">Guardar y Continuar</button>
+        </div>
+    </div>
+
+    <!-- Scripts del Motor SQLite y Lógica -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="js/database.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof initSQLite === 'function') {
+                await initSQLite();
+                detectarMesaDispositivo();
+                renderizarProductosUI();
+            }
+        });
+
+        function filtrarUI(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderizarProductosUI(cat);
+        }
+    </script>
+</body>
+</html>
